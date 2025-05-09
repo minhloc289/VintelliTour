@@ -72,6 +72,14 @@ const SpaceShare: React.FC = () => {
       return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     }
   });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      validateAllPosts();
+    }, 40000); // 1 hour in milliseconds
+  
+    // Cleanup interval when component unmounts
+    return () => clearInterval(interval);
+  }, [posts]);
   // Validate all posts for moderation
   const validateAllPosts = async () => {
     setIsValidating(true);
