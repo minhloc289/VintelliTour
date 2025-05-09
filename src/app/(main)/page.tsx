@@ -80,5 +80,6 @@ export default function Home() {
         <MapSection />
       </section>
     </div>
+
   );
 }

@@ -17,6 +17,7 @@ import {
   SEARCH_SYSTEM_PROMPT,
   ADD_ITINERARY_PROMPT,
   GENERAL_PROMPT,
+  COMBINED_REQUEST_HANDLER,
   UPDATE_ITINERARY_PROMPT,
   // UPDATE_ITINERARY_PROMPT,
 } from "./prompt";
@@ -45,6 +46,7 @@ const intentSchema = z.object({
       Intent.FindItinerary,
       Intent.UpdateItinerary,
       Intent.Weather,
+      Intent.Combined
     ])
     .describe("The type of intent"),
 });
@@ -139,6 +141,9 @@ async function callModel(
       break;
     case "activities":
       promptTemplate = SEARCH_SYSTEM_PROMPT;
+      break;
+    case "combined":
+      promptTemplate = COMBINED_REQUEST_HANDLER;
       break;
     case "addItinerary":
       promptTemplate = ADD_ITINERARY_PROMPT.replace("{userId}", state.userId);

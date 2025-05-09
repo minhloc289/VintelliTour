@@ -14,6 +14,7 @@ export enum Intent {
   GenerateItinerary = "generateItinerary",
   FindItinerary = "findItinerary",
   UpdateItinerary = "updateItinerary",
+  Combined = "combined"
 }
 
 export const GraphAnnotation = Annotation.Root({
