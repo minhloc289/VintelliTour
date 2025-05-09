@@ -17,6 +17,7 @@ type Props = {
   resetSignal: number;
   sidebarRef: RefObject<SidebarHandle | null>;
   isManualResetRef: React.MutableRefObject<boolean>;
+  suppressFirstResetRef: React.MutableRefObject<boolean>;
 };
 
 export default function ChatInterface({
@@ -25,6 +26,7 @@ export default function ChatInterface({
   resetSignal,
   sidebarRef,
   isManualResetRef,
+  suppressFirstResetRef,
 }: Props) {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>(
     []
@@ -33,6 +35,7 @@ export default function ChatInterface({
   const [isTyping, setIsTyping] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const isFirstMessageRef = useRef(true);
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -80,12 +83,19 @@ export default function ChatInterface({
     setInput("");
 
     if (isManualResetRef.current) {
-      setMessages([]); // ✅ chỉ reset nếu là thủ công
+      if (suppressFirstResetRef.current) {
+        suppressFirstResetRef.current = false;
+      } else if (isFirstMessageRef.current) {
+        // ❌ Đang sẵn sàng gửi tin nhắn đầu tiên, không reset để không mất
+      } else {
+        setMessages([]);
+      }
     }
   }, [resetSignal]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
+    isFirstMessageRef.current = false;
 
     let currentThreadId: string | null = threadId;
 
@@ -112,7 +122,12 @@ export default function ChatInterface({
         currentThreadId = data.thread.thread_id;
 
         if (currentThreadId) {
-          onThreadCreated(currentThreadId); // Cập nhật threadId trong page.tsx
+          onThreadCreated(currentThreadId); // 🔄 sẽ gọi setThreadId()
+
+          // 🔐 Đừng setMessages() trước khi threadId cập nhật xong
+          setTimeout(() => {
+            setMessages([{ role: "user", content: input }]);
+          }, 50);
         }
       } catch (error) {
         console.error("Error creating thread:", error);
@@ -218,13 +233,6 @@ export default function ChatInterface({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  useEffect(() => {
-    if (!threadId) {
-      // Nếu không có threadId, reset tin nhắn
-      setMessages([]);
-    }
-  }, [threadId]);
 
   return (
     <div className="flex flex-col h-[98%] bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
