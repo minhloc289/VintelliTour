@@ -10,8 +10,9 @@ export default function Home() {
   const [threadId, setThreadId] = useState<string | null>(null);
   const [resetSignal, setResetSignal] = useState(0);
   const isManualResetRef = useRef(true);
-
+  const suppressFirstResetRef = useRef(false);
   const sidebarRef = useRef<SidebarHandle>(null);
+  const isCreatingThreadRef = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -25,6 +26,7 @@ export default function Home() {
   useEffect(() => {
     const savedThreadId = localStorage.getItem("selectedThreadId");
     if (savedThreadId) {
+      suppressFirstResetRef.current = true;
       setThreadId(savedThreadId);
     }
   }, []);
@@ -32,6 +34,7 @@ export default function Home() {
   // ✅ Khi người dùng chủ động bấm "Cuộc trò chuyện mới"
   const handleNewThread = () => {
     isManualResetRef.current = true; // ✅ đánh dấu thủ công
+    isCreatingThreadRef.current = true;
     setThreadId(null);
     setResetSignal((prev) => prev + 1);
     localStorage.removeItem("selectedThreadId");
@@ -65,13 +68,24 @@ export default function Home() {
           threadId={threadId}
           onThreadCreated={(newThreadId: string) => {
             setThreadId(newThreadId);
-            setResetSignal((prev) => prev + 1);
+
+            // ✅ Chỉ reset nếu không phải suppress và không phải vừa tạo thread thủ công
+            if (
+              !suppressFirstResetRef.current &&
+              !isCreatingThreadRef.current
+            ) {
+              setResetSignal((prev) => prev + 1);
+            }
+
+            suppressFirstResetRef.current = false;
+            isCreatingThreadRef.current = false; // ✅ reset lại cờ
             localStorage.setItem("selectedThreadId", newThreadId);
-            isManualResetRef.current = false; // ✅ không phải do người dùng
+            isManualResetRef.current = false;
           }}
           resetSignal={resetSignal}
           sidebarRef={sidebarRef}
-          isManualResetRef={isManualResetRef} // ✅ truyền thêm prop này
+          isManualResetRef={isManualResetRef}
+          suppressFirstResetRef={suppressFirstResetRef}
         />
       </section>
 
