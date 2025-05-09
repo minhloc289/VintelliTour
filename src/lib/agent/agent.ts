@@ -17,7 +17,6 @@ import {
   SEARCH_SYSTEM_PROMPT,
   ADD_ITINERARY_PROMPT,
   GENERAL_PROMPT,
-  UPDATE_ITINERARY_PROMPT,
   // UPDATE_ITINERARY_PROMPT,
 } from "./prompt";
 import { TOOLS } from "../agent/tools";
