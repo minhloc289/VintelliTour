@@ -294,7 +294,8 @@ export default function SpaceShare(req: Request) {
         try {
           const res = await fetch(`/api/posts?location_id=${id} `);
           const data = await res.json();
-          setPosts(data);
+          const filteredPosts = data.filter((post: { status: string }) => post.status !== "flagged");
+          setPosts(filteredPosts );
         } catch (error) {
           console.error("Lỗi khi fetch posts theo địa điểm:", error);
         }
@@ -313,7 +314,7 @@ export default function SpaceShare(req: Request) {
           const url = locationId 
             ? `/api/posts?location_id=${locationId}`
             : "/api/posts";
-            
+             
           const res = await fetch(url);
           
           if (!res.ok) {
@@ -321,7 +322,8 @@ export default function SpaceShare(req: Request) {
           }
           
           const data = await res.json();
-          setPosts(data);
+          const filteredPosts = data.filter((post: { status: string }) => post.status !== "flagged");
+          setPosts(filteredPosts );
           
           // Nếu có location_id, lấy thêm thông tin về địa điểm
           if (locationId) {

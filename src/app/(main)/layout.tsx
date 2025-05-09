@@ -7,6 +7,8 @@ import Image from "next/image";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import UserProfile from "@components/userprofile/UserProfile"; // Dùng useAuth từ context gốc đã bọc ở layout.tsx
 import { usePathname } from 'next/navigation';
+import { BackgroundValidationProvider } from '../../context/BackgroundValidationContext';
+
 
 type Props = {
   children: ReactNode;
@@ -236,6 +238,10 @@ export default function MainLayout({ children }: Props) {
              </div>
            </div>
          </footer>
+
+    <BackgroundValidationProvider>
+      <div></div>
+    </BackgroundValidationProvider>
 
 
     </>
