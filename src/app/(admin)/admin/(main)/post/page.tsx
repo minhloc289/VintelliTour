@@ -72,6 +72,7 @@ const SpaceShare: React.FC = () => {
       return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     }
   });
+ 
   // Validate all posts for moderation
   const validateAllPosts = async () => {
     setIsValidating(true);
